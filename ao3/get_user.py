@@ -1,28 +1,20 @@
-from requests import get
-from bs4 import BeautifulSoup
+from .get_response import get_response
 
 
-def get_user(user_name: str) -> list[str]:
+def get_user(user_name: str) -> dict[list]:
     """
     Get basic profile info (pseud, join date, user ID).
 
     :param user_name: AO3 username of interest.
-    :return: profile information as a list[str], ['pseud', 'yyy-mm-dd', 'id'].
+
+    :return: profile as dict[list] in {column: row} format.
     """
     url = f"https://archiveofourown.org/users/{user_name}/profile/"
-    response = get(url)
+    soup = get_response(url)
 
-    if response.status_code != 200:
-        msg = (f"user '{user_name}' may not exist: "
-               f"HTML Error code {response.status_code} returned.")
+    prof = soup.find("dl", {"class": "meta"}).find_all("dd")
 
-        raise ValueError(msg)
-    elif response.url == "https://archiveofourown.org/":
-        raise ValueError(f"user '{user_name}' does not exist.")
-    else:
-        soup = BeautifulSoup(response.text, features="html.parser")
+    key = ["name", "start_date", "user_id"]
+    value = [[p.text] for p in prof]
 
-        profile = soup.find("dl", {"class": "meta"}).find_all("dd")
-        profile = [p.text for p in profile]
-
-        return profile
+    return dict(zip(key, value))
