@@ -14,7 +14,7 @@ def get_user(user_name: str) -> dict[list]:
 
     prof = soup.find("dl", {"class": "meta"}).find_all("dd")
 
-    key = ["name", "start_date", "user_id"]
+    key = ["name", "date", "user_id"]
     value = [[p.text] for p in prof]
 
     return dict(zip(key, value))
