@@ -21,13 +21,15 @@ def get_work(user_name: str) -> list[dict]:
            "kudos", "bookmarks", "hits"]
     int_var = ["words", "kudos", "bookmarks", "hits"]
 
+    user_id = list(filter(lambda s: s.find("user") >= 0, art[0]["class"]))[0]
+    user_id = user_id.replace("user-", "")
+
     row = []
     for a in art:
-        work = dict()
-
-        work["id"] = a["id"].replace("work_", "")
-        work["title"] = a.find("h4").find("a").text
-        work["date"] = a.find("p", {"class": "datetime"}).text
+        work = {"user_id": user_id,
+                "id": a["id"].replace("work_", ""),
+                "title": a.find("h4").find("a").text,
+                "date": a.find("p", {"class": "datetime"}).text}
 
         stat = a.find("dl", {"class": "stats"})
         for key in var[2:]:
