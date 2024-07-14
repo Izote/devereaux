@@ -1,13 +1,14 @@
+from datetime import date
 from .get_response import get_response
 
 
-def get_user(user_name: str) -> dict[list]:
+def get_user(user_name: str) -> dict[str]:
     """
-    Get basic profile info (pseud, join date, user ID).
+    Get basic profile info for an AO3 user.
 
     :param user_name: AO3 username of interest.
 
-    :return: profile as dict[list] in {column: row} format.
+    :return: table row in dict[str] format such that {"column": "value"}.
     """
     url = f"https://archiveofourown.org/users/{user_name}/profile/"
     soup = get_response(url)
@@ -15,6 +16,9 @@ def get_user(user_name: str) -> dict[list]:
     prof = soup.find("dl", {"class": "meta"}).find_all("dd")
 
     key = ["name", "date", "user_id"]
-    value = [[p.text] for p in prof]
+    value = [p.text for p in prof]
 
-    return dict(zip(key, value))
+    row = dict(zip(key, value))
+    row["date"] = date.fromisoformat(row["date"])
+
+    return row
